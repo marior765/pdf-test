@@ -1,23 +1,20 @@
 import React from 'react';
 import {FlatList, View, Alert} from 'react-native';
-import {Page} from 'src/constants';
+import {Page, FeedItem, RootState} from 'src/constants';
 import {connect} from 'react-redux';
 import {ListItem, Button} from 'react-native-elements';
-import * as rss from 'react-native-rss-parser';
 import PDFLib, {PDFDocument, PDFPage} from 'react-native-pdf-lib';
 
 interface Props {
-  favourites: rss.FeedItem[];
+  favourites: Record<string, FeedItem>;
 }
 
 export const FavouritesPage: Page<Props> = ({favourites}) => {
-  const keyExtractor = (item: rss.FeedItem, index: number) => index.toString();
+  const keyExtractor = (item: FeedItem, index: number) => index.toString();
 
-  const renderItem = ({item}: {item: rss.FeedItem}) => (
+  const renderItem = ({item}: {item: FeedItem}) => (
     <ListItem title={item.title} bottomDivider />
   );
-
-  // console.log(favourites.((i) => i.title + '\n' + i.description + '\n'));
 
   const exportPdf = async () => {
     const pages = favourites.map((i) =>
@@ -48,18 +45,20 @@ export const FavouritesPage: Page<Props> = ({favourites}) => {
       .catch((e) => Alert.alert('Error', e));
   };
 
+  console.log(Object.values(favourites));
+
   return (
     <View style={{flex: 1}}>
       <Button title="Export as PDF" onPress={exportPdf} />
       <FlatList
         keyExtractor={keyExtractor}
-        data={favourites}
+        data={Object.values(favourites)}
         renderItem={renderItem}
       />
     </View>
   );
 };
 
-export const Favourites = connect((store) => ({
-  favourites: store.favouriteReducer.favourites,
+export const Favourites = connect(({favouriteReducer}: RootState) => ({
+  favourites: favouriteReducer.favourites,
 }))(FavouritesPage);

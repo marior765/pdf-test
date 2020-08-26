@@ -1,36 +1,47 @@
 import React, {useEffect, useCallback} from 'react';
 import {FlatList} from 'react-native';
-import {Page} from 'src/constants';
+import {Page, FeedItem, RootState} from 'src/constants';
 import {fetchList, addFavourite} from 'src/store';
-import {Swipeable} from 'src/components';
+import {Swipeable, Container} from 'src/components';
 import {connect} from 'react-redux';
 import {ListItem} from 'react-native-elements';
-import * as rss from 'react-native-rss-parser';
 
 interface Props {
   fetchList: () => void;
-  addFavourite: (item: rss.FeedItem) => void;
-  list: any[];
+  addFavourite: (item: FeedItem) => void;
+  list: FeedItem[];
+  isLoading: boolean;
 }
 
-export const HomePage: Page<Props> = ({fetchList, list, addFavourite}) => {
+export const HomePage: Page<Props> = ({
+  fetchList,
+  list,
+  addFavourite,
+  isLoading,
+}) => {
   useEffect(() => {
     fetchList();
   }, []);
 
   const keyExtractor = useCallback(
-    (item: rss.FeedItem, index: number) => index.toString(),
+    (item: FeedItem, index: number) => index.toString(),
     [],
   );
 
-  const renderItem = ({item}: {item: rss.FeedItem}) => (
+  const renderItem = ({item}: {item: FeedItem}) => (
     <Swipeable onSwipe={() => addFavourite(item)}>
       <ListItem title={item.title} bottomDivider chevron />
     </Swipeable>
   );
 
   return (
-    <FlatList keyExtractor={keyExtractor} data={list} renderItem={renderItem} />
+    <Container isLoading={isLoading}>
+      <FlatList
+        keyExtractor={keyExtractor}
+        data={list}
+        renderItem={renderItem}
+      />
+    </Container>
   );
 };
 
@@ -40,8 +51,9 @@ const mapDispatchToProps = {
 };
 
 export const Home = connect(
-  (store) => ({
-    list: store.listReducer.list,
+  ({listReducer}: RootState) => ({
+    list: listReducer.list,
+    isLoading: listReducer.isLoading,
   }),
   mapDispatchToProps,
 )(HomePage);

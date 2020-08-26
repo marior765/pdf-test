@@ -1,7 +1,7 @@
 import {FC} from 'react';
-import {AnyAction} from 'redux';
-import {RootStateOrAny} from 'react-redux';
-import {ThunkDispatch as ThunkType} from 'redux-thunk';
+import * as rss from 'react-native-rss-parser';
+import {State as FavouritesState} from 'src/store/reducers/favourite-reducer';
+import {State as ListState} from 'src/store/reducers/list-reducer';
 
 export interface INavigation {
   popToTop: () => {};
@@ -17,8 +17,9 @@ export type Component<P> = FC<Readonly<P>>;
 
 export type Page<P> = FC<Readonly<P & {navigation: INavigation}>>;
 
-export type ThunkDispatch<T extends AnyAction = AnyAction> = ThunkType<
-  Promise<void>,
-  RootStateOrAny,
-  T
->;
+export type FeedItem = rss.FeedItem;
+
+export interface RootState {
+  listReducer: ListState;
+  favouriteReducer: FavouritesState;
+}

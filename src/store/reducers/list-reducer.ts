@@ -2,7 +2,7 @@ import {createReducer, PayloadAction} from '@reduxjs/toolkit';
 import {addList, setListLoading} from '../actions';
 import * as rss from 'react-native-rss-parser';
 
-interface State {
+export interface State {
   isLoading: boolean;
   list: rss.FeedItem[];
 }
